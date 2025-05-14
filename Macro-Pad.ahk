@@ -58,7 +58,7 @@ EnableInterception() {
         RunWait('cmd.exe /c taskkill /IM intercept.exe /F', , "Hide")
 
         ; Run the intercept driver
-        Run('cmd.exe /c ' INTERCEPT ' /apply', INTERCEPT_PATH)
+        Run('cmd.exe /c ' INTERCEPT ' /apply', INTERCEPT_PATH, "Hide")
 
         interceptEnabled := true
     } catch as err {
