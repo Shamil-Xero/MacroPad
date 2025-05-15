@@ -1,4 +1,6 @@
-# Dynamic Numpad Macro System
+# Dynamic Numpad Macro System (Under Developement)
+
+## V1 Available to use
 
 Turn your numpad into a customizable macro pad with multiple layers and visual feedback.
 
