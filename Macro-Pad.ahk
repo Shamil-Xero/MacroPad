@@ -12,8 +12,8 @@ global interceptEnabled := false
 ; =======================
 ; Key used to determine if key is intercepted
 INTERCEPT_KEY := "F23"
-INTERCEPT := A_WorkingDir "\intercept\intercept.exe"
-INTERCEPT_PATH := A_WorkingDir "\intercept"
+INTERCEPT := A_WorkingDir "\Lib\Intercept\intercept.exe"
+INTERCEPT_PATH := A_WorkingDir "\Lib\intercept"
 
 ; =======================
 ; Main Script
@@ -58,7 +58,7 @@ EnableInterception() {
         RunWait('cmd.exe /c taskkill /IM intercept.exe /F', , "Hide")
 
         ; Run the intercept driver
-        Run('cmd.exe /c ' INTERCEPT ' /apply', INTERCEPT_PATH, "Hide")
+        Run('cmd.exe /c ' INTERCEPT ' /apply', INTERCEPT_PATH)
 
         interceptEnabled := true
     } catch as err {

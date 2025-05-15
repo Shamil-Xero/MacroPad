@@ -381,3 +381,21 @@ class DynamicNumpad {
         }
     }
 }
+
+; Parse command line arguments
+args := A_Args
+iniFile := ""
+timeout := -1
+mode := 1
+
+for i, arg in args {
+    if (arg = "--ini" && args.Has(i + 1)) {
+        iniFile := args[i + 1]
+    } else if (arg = "--timeout" && args.Has(i + 1)) {
+        timeout := Integer(args[i + 1])
+    } else if (arg = "--mode" && args.Has(i + 1)) {
+        mode := Integer(args[i + 1])
+    }
+}
+
+numpad := DynamicNumpad(iniFile, timeout, mode)
