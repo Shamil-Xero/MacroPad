@@ -7,10 +7,10 @@ INSTALL_INTERCEPT_PATH := A_WorkingDir "\Lib\Intercept\Interception\command line
 iniFilePath := A_WorkingDir "\Lib\Intercept\keyremap.ini"
 INTERCEPT := A_WorkingDir "\Lib\Intercept\intercept.exe"
 INTERCEPT_PATH := A_WorkingDir "\Lib\intercept"
-KEYREMAP_SETUP_PATH := A_WorkingDir "\Lib\Keyremap_Setup.ahk"
+KEYREMAP_SETUP_PATH := A_WorkingDir "\Keyremap_Setup.ahk"
 KEYREMAP_SETUP_SHORTCUT_PATH := A_Startup "\Keyremap_Setup.lnk"
-MACRO_PAD_SETUP_PATH := A_WorkingDir "\Lib\Macro-Pad_Setup.ahk"
-MACRO_PAD_PATH := A_WorkingDir "\Lib\Macro-Pad.ahk"
+MACRO_PAD_SETUP_PATH := A_WorkingDir "\Macro-Pad_Setup.ahk"
+MACRO_PAD := A_WorkingDir "\Macro-Pad.ahk"
 MACRO_PAD_SHORTCUT_PATH := A_Startup "\Macro-Pad.lnk"
 
 KeyWaitAny(Options := "") {
