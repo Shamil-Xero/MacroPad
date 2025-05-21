@@ -28,8 +28,8 @@ if result = "Yes" {
     if result = "OK" {
         FileCreateShortcut "cmd.exe", KEYREMAP_SETUP_SHORTCUT_PATH, A_WorkingDir "\", "/k `"" KEYREMAP_SETUP_PATH "`"",
             "To run keyremap setup"
-        ; Run 'cmd /c Shutdown /r /t 0', , "Hide"
-        MsgBox("Restarted")
+        Run 'cmd /c Shutdown /r /t 10', , "Hide"
+        ; MsgBox("Restarted")
         ExitApp
     }
 }
