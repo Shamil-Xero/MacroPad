@@ -5,7 +5,7 @@
 Turn your numpad into a customizable macro pad with multiple layers and visual feedback.
 
 ## Installation
-### Open powershell at your desired location paste this commands
+### Open powershell (at your desired location) and paste this commands
     $repo = "Shamil-Xero/MacroPad"
     $url = "https://github.com/$repo/archive/refs/heads/main.zip"
     $zip = ".\MacroPad.zip"
