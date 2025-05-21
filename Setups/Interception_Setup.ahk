@@ -26,9 +26,9 @@ if result = "Yes" {
         "The Keyremap setup will start automatically after the restart.`n`nPress ok when ready to restart!!",
         "Interception Setup", "OKCancel")
     if result = "OK" {
-        FileCreateShortcut "cmd.exe", KEYREMAP_SETUP_SHORTCUT_PATH, A_WorkingDir "\", "/k `"" KEYREMAP_SETUP_PATH "`"",
+        FileCreateShortcut "cmd.exe", KEYREMAP_SETUP_SHORTCUT_PATH, A_WorkingDir "\", "/c `"" KEYREMAP_SETUP_PATH "`"",
             "To run keyremap setup", , , , 7
-        Run 'cmd /c Shutdown /r /t 10', , "Hide"
+        Run 'cmd /c Shutdown /r /t 0', , "Hide"
         ; MsgBox("Restarted")
         ExitApp
     }
