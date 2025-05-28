@@ -26,6 +26,7 @@ Turn your numpad into a customizable macro pad with multiple layers and visual f
 
     # Exit script
     exit
+    
 
 ## Features
 

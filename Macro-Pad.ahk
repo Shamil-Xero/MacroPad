@@ -4,6 +4,7 @@
 
 ; Global variables
 global numpadGui := ""
+global numpadModes := 4
 global currentMode := 1
 global interceptEnabled := false
 
@@ -158,20 +159,20 @@ numpadMode4() {
 ; Decrement mode (/ key)
 NumpadDiv:: {
     global currentMode
-    currentMode := currentMode = 1 ? 4 : currentMode - 1
+    currentMode := currentMode = 1 ? numpadModes : currentMode - 1
     ShowNumpadGUI(currentMode)
 }
 
 ; Show GUI with timeout (* key)
 NumpadMult:: {
     global currentMode
-    ShowNumpadGUI(currentMode, 5)
+    ShowNumpadGUI(currentMode, numpadModes + 1)
 }
 
 ; Increment mode (- key)
 NumpadSub:: {
     global currentMode
-    currentMode := Mod(currentMode, 4) + 1
+    currentMode := Mod(currentMode, numpadModes) + 1
     ShowNumpadGUI(currentMode)
 }
 
