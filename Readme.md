@@ -6,7 +6,7 @@ Turn your numpad into a customizable macro pad with multiple layers and visual f
 
 ## Installation
 
-In the [Visual C++ Redistributable Runtimes All-in-One](https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/)
+<!-- In the [Visual C++ Redistributable Runtimes All-in-One](https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/) -->
 
 ### Open powershell (at your desired location) and paste this commands
     $repo = "Shamil-Xero/MacroPad"
