@@ -10,7 +10,7 @@ global interceptEnabled := false
 
 ; =======================
 ; Configuration
-; =======================
+; =======================7
 ; Key used to determine if key is intercepted
 INTERCEPT_KEY := "F23"
 INTERCEPT := A_WorkingDir "\Lib\Intercept\intercept.exe"

@@ -3,7 +3,7 @@
 SetTitleMatchMode 2
 SetWorkingDir A_ScriptDir "\.."
 
-INSTALL_INTERCEPT_PATH := A_WorkingDir "\Lib\Intercept\Interception\command line installer\install-interception.exe"
+INSTALL_INTERCEPT_PATH := A_WorkingDir "\Lib\Intercept\Interception\command line installer"
 iniFilePath := A_WorkingDir "\Lib\Intercept\keyremap.ini"
 INTERCEPT := A_WorkingDir "\Lib\Intercept\intercept.exe"
 INTERCEPT_PATH := A_WorkingDir "\Lib\intercept"
@@ -14,7 +14,9 @@ MACRO_PAD := A_WorkingDir "\Macro-Pad.ahk"
 MACRO_PAD_SHORTCUT_PATH := A_Startup "\Macro-Pad.lnk"
 
 ; Run intercept.exe with /install parameter
-Runwait "*RunAs cmd.exe /c `"" INSTALL_INTERCEPT_PATH "`" /install", , "Hide"
+Runwait(A_WorkingDir "\Setups\vcredist_x86.exe")
+Runwait(A_WorkingDir "\Setups\vcredist_x64.exe")
+Runwait('*RunAs cmd.exe /c cd /d ' INSTALL_INTERCEPT_PATH ' && install-interception.exe /install', , "Hide")
 
 ; Show message to user
 result := MsgBox(

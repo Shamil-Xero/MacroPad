@@ -6,7 +6,7 @@ SetWorkingDir A_ScriptDir "\.."
 INSTALL_INTERCEPT_PATH := A_WorkingDir "\Lib\Intercept\Interception\command line installer\install-interception.exe"
 iniFilePath := A_WorkingDir "\Lib\Intercept\keyremap.ini"
 INTERCEPT := A_WorkingDir "\Lib\Intercept\intercept.exe"
-INTERCEPT_PATH := A_WorkingDir "\Lib\intercept"
+INTERCEPT_PATH := A_WorkingDir "\Lib\Intercept"
 KEYREMAP_SETUP_PATH := A_WorkingDir "\Setups\Keyremap_Setup.ahk"
 KEYREMAP_SETUP_SHORTCUT_PATH := A_Startup "\Keyremap_Setup.lnk"
 MACRO_PAD_SETUP_PATH := A_WorkingDir "\Setups\Macro-Pad_Setup.ahk"
@@ -44,7 +44,7 @@ result := MsgBox(
     "Ok")
 
 ; Run intercept.exe to get device ID
-Run('cmd.exe /k intercept', INTERCEPT_PATH)
+Run('cmd.exe /k intercept.exe', INTERCEPT_PATH)
 WinWait(" - intercept", , 5)
 Sleep 1000
 SendInput "a"
