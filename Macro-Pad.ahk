@@ -4,7 +4,7 @@
 
 ; Global variables
 global numpadGui := ""
-global numpadModes := 4
+global numpadModes := 6
 global currentMode := 1
 global interceptEnabled := false
 
@@ -196,10 +196,7 @@ NumpadAdd::
 ; NumpadSub::
 ; NumpadMult::
 ; NumpadDiv::
-NumpadEnter:: {
-    ToolTip "Mode: " currentMode " - Key {" A_ThisHotkey "}"
-    SetTimer ToolTip, -500
-}
+NumpadEnter:: Send("{" A_ThisHotKey "}")
 
 ; Mode 2: Application Launcher
 #HotIf numpadMode2()
