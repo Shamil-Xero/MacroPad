@@ -24,7 +24,6 @@ class DynamicNumpad {
     fadeOutTimer := 0
     isSelectingImage := false
     shouldFadeOut := false
-    currentAlpha := 0
 
     /**
      * Create a new DynamicNumpad instance
@@ -121,7 +120,6 @@ class DynamicNumpad {
 
         this.gui.Opt("+LastFound")
         WinSetTransparent(0)  ; Start fully transparent
-        this.currentAlpha := 0
     }
 
     /**
@@ -142,24 +140,8 @@ class DynamicNumpad {
         yPos := this.settings["WindowY"]
         this.gui.Show("x" xPos " y" yPos " w" this.settings["WindowWidth"] " h" this.settings["WindowHeight"] " Hide")
 
-        ; Start fade-in animation from current alpha
-        try {
-            if (!IsObject(this.gui))
-                return
-            if (!this.gui.Hwnd)
-                return
-            ; Get current transparency (alpha) if already set
-            alpha := this.currentAlpha
-            if (alpha >= this.settings["Transparency"]) {
-                this.gui.Opt("+LastFound")
-                WinSetTransparent(this.settings["Transparency"])
-                this.fadeInTimer := 0
-            } else {
-                this.FadeIn(alpha)
-            }
-        } catch {
-            return
-        }
+        ; Start fade-in animation
+        this.FadeIn()
 
         ; Set timeout if specified
         if (this.timeout > 0) {
@@ -260,19 +242,13 @@ class DynamicNumpad {
                 return
             if (!this.gui.Hwnd)
                 return
-            this.currentAlpha := alpha
             if (alpha < this.settings["Transparency"]) {
                 alpha += 5
-                if (alpha > this.settings["Transparency"]) {
-                    alpha := this.settings["Transparency"]
-                }
-                this.currentAlpha := alpha
                 this.gui.Opt("+LastFound")
                 WinSetTransparent(alpha)
                 this.gui.Show()
                 this.fadeInTimer := SetTimer(ObjBindMethod(DynamicNumpad, "FadeInTimerCallback", this, alpha), -20)
             } else {
-                this.currentAlpha := this.settings["Transparency"]
                 this.gui.Opt("+LastFound")
                 WinSetTransparent(this.settings["Transparency"])
                 this.fadeInTimer := 0
@@ -313,20 +289,14 @@ class DynamicNumpad {
                 return
             if (!this.gui.Hwnd)
                 return
-            this.currentAlpha := alpha
             if (this.isSelectingImage)
                 return
             if (alpha > 0) {
                 alpha -= 5
-                if (alpha < 0) {
-                    alpha := 0
-                }
-                this.currentAlpha := alpha
                 this.gui.Opt("+LastFound")
                 WinSetTransparent(alpha)
                 this.fadeOutTimer := SetTimer(ObjBindMethod(DynamicNumpad, "FadeOutTimerCallback", this, alpha), -20)
             } else {
-                this.currentAlpha := 0
                 this.ClearTimers()
                 this.gui.Destroy()
                 this.gui := ""
