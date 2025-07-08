@@ -39,8 +39,6 @@ InitScript() {
     ; Show the numpad GUI with the current mode
     ShowNumpadGUI(currentMode)
 
-    ; Show a brief tooltip to confirm the mode
-    ShowModeTooltip()
 }
 
 /**
@@ -60,8 +58,9 @@ EnableInterception() {
 
         ; Run the intercept driver
         Run('cmd.exe /c ' INTERCEPT ' /apply', INTERCEPT_PATH, "Hide")
-
         interceptEnabled := true
+        ; ToolTip "Interception Successfully Enabled"
+        ; SetTimer RemoveToolTip, -500
     } catch as err {
         MsgBox("Failed to start interception: " err.Message "`n`nPlease make sure intercept.exe is installed in: " INTERCEPT_PATH
         )
@@ -96,6 +95,10 @@ ShowNumpadGUI(mode, timeout := -1, iniFile := "") {
 ShowModeTooltip() {
     ToolTip "Mode: " currentMode
     SetTimer ToolTip, -500
+}
+
+RemoveToolTip() {
+    ToolTip ""
 }
 
 /**
@@ -190,9 +193,9 @@ Numpad9::
 Numpad0::
 NumpadDot::
 NumpadAdd::
-NumpadSub::
-NumpadMult::
-NumpadDiv::
+; NumpadSub::
+; NumpadMult::
+; NumpadDiv::
 NumpadEnter:: {
     ToolTip "Mode: " currentMode " - Key {" A_ThisHotkey "}"
     SetTimer ToolTip, -500
@@ -212,9 +215,9 @@ Numpad9::
 Numpad0::
 NumpadDot::
 NumpadAdd::
-NumpadSub::
-NumpadMult::
-NumpadDiv::
+; NumpadSub::
+; NumpadMult::
+; NumpadDiv::
 NumpadEnter:: {
     ToolTip "Mode: " currentMode " - Key {" A_ThisHotkey "}"
     SetTimer ToolTip, -500
@@ -234,9 +237,9 @@ Numpad9::
 Numpad0::
 NumpadDot::
 NumpadAdd::
-NumpadSub::
-NumpadMult::
-NumpadDiv::
+; NumpadSub::
+; NumpadMult::
+; NumpadDiv::
 NumpadEnter:: {
     ToolTip "Mode: " currentMode " - Key {" A_ThisHotkey "}"
     SetTimer ToolTip, -500
@@ -256,9 +259,9 @@ Numpad9::
 Numpad0::
 NumpadDot::
 NumpadAdd::
-NumpadSub::
-NumpadMult::
-NumpadDiv::
+; NumpadSub::
+; NumpadMult::
+; NumpadDiv::
 NumpadEnter:: {
     ToolTip "Mode: " currentMode " - Key {" A_ThisHotkey "}"
     SetTimer ToolTip, -500

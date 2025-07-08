@@ -20,8 +20,11 @@ class DynamicNumpad {
     buttonImages := Map()
     isImageSet := Map()
     fadeTimer := 0
+    fadeInTimer := 0
+    fadeOutTimer := 0
     isSelectingImage := false
     shouldFadeOut := false
+    currentAlpha := 0
 
     /**
      * Create a new DynamicNumpad instance
@@ -30,6 +33,7 @@ class DynamicNumpad {
      * @param {Integer} mode - Which mode/layer to display (1-4)
      */
     __New(iniFile := "", timeout := -1, mode := 1) {
+        this.ClearTimers() ; Ensure no timers from previous instance
         this.mode := mode
         this.LoadSettings()
 
@@ -70,7 +74,7 @@ class DynamicNumpad {
             "ButtonSize", 80,
             "ImagesIniFile1", "numpad_images.ini",
             "ImagesIniFile2", "numpad_images2.ini",
-            "ImagesIniFile3", "numpad_images3.ini", 
+            "ImagesIniFile3", "numpad_images3.ini",
             "ImagesIniFile4", "numpad_images4.ini",
             "Timeout", 5
         )
@@ -111,11 +115,13 @@ class DynamicNumpad {
         this.gui.SetFont("s" this.settings["FontSize"] " bold", this.settings["FontName"])
 
         ; Add title bar for dragging
-        this.titleBar := this.gui.Add("Text", "x0 y0 w" this.settings["WindowWidth"] " h30 Background" this.settings["TitleBarColor"])
+        this.titleBar := this.gui.Add("Text", "x0 y0 w" this.settings["WindowWidth"] " h30 Background" this.settings[
+            "TitleBarColor"])
         this.titleBar.OnEvent("Click", this.DragWindow.Bind(this))
 
         this.gui.Opt("+LastFound")
         WinSetTransparent(0)  ; Start fully transparent
+        this.currentAlpha := 0
     }
 
     /**
@@ -136,8 +142,24 @@ class DynamicNumpad {
         yPos := this.settings["WindowY"]
         this.gui.Show("x" xPos " y" yPos " w" this.settings["WindowWidth"] " h" this.settings["WindowHeight"] " Hide")
 
-        ; Start fade-in animation
-        this.FadeIn()
+        ; Start fade-in animation from current alpha
+        try {
+            if (!IsObject(this.gui))
+                return
+            if (!this.gui.Hwnd)
+                return
+            ; Get current transparency (alpha) if already set
+            alpha := this.currentAlpha
+            if (alpha >= this.settings["Transparency"]) {
+                this.gui.Opt("+LastFound")
+                WinSetTransparent(this.settings["Transparency"])
+                this.fadeInTimer := 0
+            } else {
+                this.FadeIn(alpha)
+            }
+        } catch {
+            return
+        }
 
         ; Set timeout if specified
         if (this.timeout > 0) {
@@ -203,7 +225,8 @@ class DynamicNumpad {
             btn.SetFont("s" this.settings["FontSize"] " bold", this.settings["FontName"])
 
             ; Create background for picture
-            bg := this.gui.Add("Text", "x" x " y" y " w" w " h" h " Hidden Background" this.settings["ButtonBackgroundColor"])
+            bg := this.gui.Add("Text", "x" x " y" y " w" w " h" h " Hidden Background" this.settings[
+                "ButtonBackgroundColor"])
 
             ; Create picture control
             pic := this.gui.Add("Picture", "x" x " y" y " w" w " h" h " Hidden")
@@ -232,24 +255,52 @@ class DynamicNumpad {
      * Handle fade-in animation
      */
     FadeIn(alpha := 0) {
-        if (alpha < this.settings["Transparency"]) {
-            alpha += 5
-            this.gui.Opt("+LastFound")
-            WinSetTransparent(alpha)
-            this.gui.Show()
-            SetTimer(() => this.FadeIn(alpha), -20)
-        } else {
-            this.gui.Opt("+LastFound")
-            WinSetTransparent(this.settings["Transparency"])
+        try {
+            if (!IsObject(this.gui))
+                return
+            if (!this.gui.Hwnd)
+                return
+            this.currentAlpha := alpha
+            if (alpha < this.settings["Transparency"]) {
+                alpha += 5
+                if (alpha > this.settings["Transparency"]) {
+                    alpha := this.settings["Transparency"]
+                }
+                this.currentAlpha := alpha
+                this.gui.Opt("+LastFound")
+                WinSetTransparent(alpha)
+                this.gui.Show()
+                this.fadeInTimer := SetTimer(ObjBindMethod(DynamicNumpad, "FadeInTimerCallback", this, alpha), -20)
+            } else {
+                this.currentAlpha := this.settings["Transparency"]
+                this.gui.Opt("+LastFound")
+                WinSetTransparent(this.settings["Transparency"])
+                this.fadeInTimer := 0
+            }
+        } catch {
+            return
         }
+    }
+
+    static FadeInTimerCallback(instance, alpha) {
+        if IsObject(instance)
+            instance.FadeIn(alpha)
     }
 
     /**
      * Start the fade-out animation
      */
     StartFadeOut() {
-        if (!this.isSelectingImage && this.shouldFadeOut) {
-            this.FadeOut(this.settings["Transparency"])
+        try {
+            if (!IsObject(this.gui))
+                return
+            if (!this.gui.Hwnd)
+                return
+            if (!this.isSelectingImage && this.shouldFadeOut) {
+                this.FadeOut(this.settings["Transparency"])
+            }
+        } catch {
+            return
         }
     }
 
@@ -257,25 +308,37 @@ class DynamicNumpad {
      * Handle fade-out animation
      */
     FadeOut(alpha) {
-        if (this.isSelectingImage)
-            return
-
-        if (alpha > 0) {
-            alpha -= 5
-            try {
+        try {
+            if (!IsObject(this.gui))
+                return
+            if (!this.gui.Hwnd)
+                return
+            this.currentAlpha := alpha
+            if (this.isSelectingImage)
+                return
+            if (alpha > 0) {
+                alpha -= 5
+                if (alpha < 0) {
+                    alpha := 0
+                }
+                this.currentAlpha := alpha
                 this.gui.Opt("+LastFound")
                 WinSetTransparent(alpha)
-                SetTimer(() => this.FadeOut(alpha), -20)
-            } catch {
-                return  ; Exit if GUI no longer exists
-            }
-        } else {
-            try {
+                this.fadeOutTimer := SetTimer(ObjBindMethod(DynamicNumpad, "FadeOutTimerCallback", this, alpha), -20)
+            } else {
+                this.currentAlpha := 0
+                this.ClearTimers()
                 this.gui.Destroy()
-            } catch {
-                return  ; Exit if GUI no longer exists
+                this.gui := ""
             }
+        } catch {
+            return
         }
+    }
+
+    static FadeOutTimerCallback(instance, alpha) {
+        if IsObject(instance)
+            instance.FadeOut(alpha)
     }
 
     /**
@@ -285,15 +348,10 @@ class DynamicNumpad {
         ; Don't allow multiple file picker dialogs
         if (this.isSelectingImage)
             return
-
         this.isSelectingImage := true
         this.shouldFadeOut := false  ; Prevent fade out while selecting
-
         ; Stop the fade timer if it's running
-        if (this.fadeTimer) {
-            SetTimer(this.fadeTimer, 0)
-            this.fadeTimer := 0
-        }
+        this.ClearTimers()
 
         ; Show file dialog
         selectedFile := FileSelect(1, , "Select image for " buttonText, "Image Files (*.png; *.jpg; *.jpeg; *.gif)")
@@ -318,7 +376,6 @@ class DynamicNumpad {
 
         this.isSelectingImage := false
         this.shouldFadeOut := true  ; Re-enable fade out
-
         ; Restart the fade timer if timeout was set
         if (this.timeout > 0) {
             this.fadeTimer := SetTimer(() => this.StartFadeOut(), -this.timeout * 1000)
@@ -378,6 +435,24 @@ class DynamicNumpad {
             }
         } catch as e {
             MsgBox("Error loading INI file: " e.Message)
+        }
+    }
+
+    /**
+     * Clear all running timers related to this instance
+     */
+    ClearTimers() {
+        if (this.fadeTimer) {
+            SetTimer(this.fadeTimer, 0)
+            this.fadeTimer := 0
+        }
+        if (this.fadeInTimer) {
+            SetTimer(this.fadeInTimer, 0)
+            this.fadeInTimer := 0
+        }
+        if (this.fadeOutTimer) {
+            SetTimer(this.fadeOutTimer, 0)
+            this.fadeOutTimer := 0
         }
     }
 }
