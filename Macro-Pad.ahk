@@ -4,7 +4,7 @@
 
 ; Global variables
 global numpadGui := ""
-global numpadModes := 6
+global numpadModes := 4
 global currentMode := 1
 global interceptEnabled := false
 
