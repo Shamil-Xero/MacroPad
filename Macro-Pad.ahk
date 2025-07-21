@@ -4,8 +4,8 @@
 
 ; Global variables
 global numpadGui := ""
-global numpadModes := 4
-global currentMode := 1
+global numpadLayers := 4
+global currentLayer := 1
 global interceptEnabled := false
 
 ; =======================
@@ -36,8 +36,8 @@ InitScript() {
     EnableInterception()
     ; }
 
-    ; Show the numpad GUI with the current mode
-    ShowNumpadGUI(currentMode)
+    ; Show the numpad GUI with the current layer
+    ShowNumpadGUI(currentLayer)
 
 }
 
@@ -69,10 +69,10 @@ EnableInterception() {
 }
 
 /**
- * Show the numpad GUI with the specified mode
+ * Show the numpad GUI with the specified layer
  */
-ShowNumpadGUI(mode, timeout := -1, iniFile := "") {
-    global currentMode, numpadGui
+ShowNumpadGUI(layer, timeout := -1, iniFile := "") {
+    global currentLayer, numpadGui
 
     ; Destroy existing GUI if it exists
     if (numpadGui != "") {
@@ -82,18 +82,18 @@ ShowNumpadGUI(mode, timeout := -1, iniFile := "") {
         }
     }
 
-    ; Create a new GUI with the specified mode
-    numpadGui := DynamicNumpad(iniFile, timeout, mode)
+    ; Create a new GUI with the specified layer
+    numpadGui := DynamicNumpad(iniFile, timeout, layer)
 
-    ; Show current mode in tooltip
-    ShowModeTooltip()
+    ; Show current layer in tooltip
+    ShowLayerTooltip()
 }
 
 /**
- * Show a tooltip with the current mode
+ * Show a tooltip with the current layer
  */
-ShowModeTooltip() {
-    ToolTip "Mode: " currentMode
+ShowLayerTooltip() {
+    ToolTip "Layer: " currentLayer
     SetTimer ToolTip, -500
 }
 
@@ -109,11 +109,11 @@ IsIntercepted() {
 }
 
 /**
- * Check if we're in a specific mode with interception active
+ * Check if we're in a specific layer with interception active
  */
-numpadMode1() {
-    global currentMode
-    if (currentMode == 1 and IsIntercepted) {
+numpadLayer1() {
+    global currentLayer
+    if (currentLayer == 1 and IsIntercepted) {
         return true
     }
     else {
@@ -121,9 +121,9 @@ numpadMode1() {
     }
 }
 
-numpadMode2() {
-    global currentMode
-    if (currentMode == 2 and IsIntercepted) {
+numpadLayer2() {
+    global currentLayer
+    if (currentLayer == 2 and IsIntercepted) {
         return true
     }
     else {
@@ -131,9 +131,9 @@ numpadMode2() {
     }
 }
 
-numpadMode3() {
-    global currentMode
-    if (currentMode == 3 and IsIntercepted) {
+numpadLayer3() {
+    global currentLayer
+    if (currentLayer == 3 and IsIntercepted) {
         return true
     }
     else {
@@ -141,10 +141,10 @@ numpadMode3() {
     }
 }
 
-numpadMode4() {
-    global currentMode
+numpadLayer4() {
+    global currentLayer
 
-    if (currentMode == 4 and IsIntercepted) {
+    if (currentLayer == 4 and IsIntercepted) {
         return true
     }
     else {
@@ -156,31 +156,31 @@ numpadMode4() {
 ; Hotkeys
 ; =======================
 
-; Mode switching hotkeys
+; Layer switching hotkeys
 #HotIf IsIntercepted()
 
-; Decrement mode (/ key)
+; Decrement layer (/ key)
 NumpadDiv:: {
-    global currentMode
-    currentMode := currentMode = 1 ? numpadModes : currentMode - 1
-    ShowNumpadGUI(currentMode)
+    global currentLayer
+    currentLayer := currentLayer = 1 ? numpadLayers : currentLayer - 1
+    ShowNumpadGUI(currentLayer)
 }
 
 ; Show GUI with timeout (* key)
 NumpadMult:: {
-    global currentMode
-    ShowNumpadGUI(currentMode, numpadModes + 1)
+    global currentLayer
+    ShowNumpadGUI(currentLayer, numpadLayers + 1)
 }
 
-; Increment mode (- key)
+; Increment layer (- key)
 NumpadSub:: {
-    global currentMode
-    currentMode := Mod(currentMode, numpadModes) + 1
-    ShowNumpadGUI(currentMode)
+    global currentLayer
+    currentLayer := Mod(currentLayer, numpadLayers) + 1
+    ShowNumpadGUI(currentLayer)
 }
 
-; Mode 1: Default Numpad (pass-through keys)
-#HotIf numpadMode1()
+; Layer 1: Default Numpad (pass-through keys)
+#HotIf numpadLayer1()
 Numpad1::
 Numpad2::
 Numpad3::
@@ -198,10 +198,10 @@ NumpadAdd::
 ; NumpadDiv::
 NumpadEnter:: Send("{" A_ThisHotKey "}")
 
-; Mode 2: Application Launcher
-#HotIf numpadMode2()
-Numpad1::
-Numpad2::
+; Layer 2: Application Launcher
+#HotIf numpadLayer2()
+Numpad1::Run("notepad.exe")
+Numpad2::Run("calc.exe")
 Numpad3::
 Numpad4::
 Numpad5::
@@ -216,14 +216,14 @@ NumpadAdd::
 ; NumpadMult::
 ; NumpadDiv::
 NumpadEnter:: {
-    ToolTip "Mode: " currentMode " - Key {" A_ThisHotkey "}"
+    ToolTip "Layer: " currentLayer " - Key {" A_ThisHotkey "}"
     SetTimer ToolTip, -500
 }
 
-; Mode 3: YouTube Tools
-#HotIf numpadMode3()
-Numpad1::
-Numpad2::
+; Layer 3: YouTube Tools
+#HotIf numpadLayer3()
+Numpad1::Send("Hello, world!")
+Numpad2::Send("Your email@example.com")
 Numpad3::
 Numpad4::
 Numpad5::
@@ -238,12 +238,12 @@ NumpadAdd::
 ; NumpadMult::
 ; NumpadDiv::
 NumpadEnter:: {
-    ToolTip "Mode: " currentMode " - Key {" A_ThisHotkey "}"
+    ToolTip "Layer: " currentLayer " - Key {" A_ThisHotkey "}"
     SetTimer ToolTip, -500
 }
 
-; Mode 4: Custom Mode
-#HotIf numpadMode4()
+; Layer 4: Custom Layer
+#HotIf numpadLayer4()
 Numpad1::
 Numpad2::
 Numpad3::
@@ -260,7 +260,7 @@ NumpadAdd::
 ; NumpadMult::
 ; NumpadDiv::
 NumpadEnter:: {
-    ToolTip "Mode: " currentMode " - Key {" A_ThisHotkey "}"
+    ToolTip "Layer: " currentLayer " - Key {" A_ThisHotkey "}"
     SetTimer ToolTip, -500
 }
 
