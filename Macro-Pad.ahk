@@ -1,26 +1,26 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
-#Include "DynamicNumpad.ahk"  ; Include the refactored class
+#Include "DynamicNumpad.ahk"  ; Include the refactored class for GUI and visuals
 
-; Global variables
-global numpadGui := ""
-global numpadLayers := 4
-global currentLayer := 1
-global interceptEnabled := false
+; === Global variables ===
+global numpadGui := ""                  ; Holds the GUI object
+global numpadLayers := 4                 ; Number of layers (sets of macros)
+global currentLayer := 1                 ; Currently active layer
+global interceptEnabled := false         ; Whether interception is enabled
 
 ; =======================
 ; Configuration
 ; =======================7
 ; Key used to determine if key is intercepted
-INTERCEPT_KEY := "F23"
-INTERCEPT := A_WorkingDir "\Lib\Intercept\intercept.exe"
-INTERCEPT_PATH := A_WorkingDir "\Lib\intercept"
+INTERCEPT_KEY := "F23"                   ; Modifier key for identifying input from the macro pad
+INTERCEPT := A_WorkingDir "\Lib\Intercept\intercept.exe"   ; Path to intercept.exe
+INTERCEPT_PATH := A_WorkingDir "\Lib\intercept"            ; Path to intercept folder
 
 ; =======================
 ; Main Script
 ; =======================
 
-; Initialize the script
+; Initialize the script and show the GUI
 InitScript()
 
 ; =======================
@@ -28,52 +28,46 @@ InitScript()
 ; =======================
 
 /**
- * Initialize the script and setup the environment
+ * Initializes the script, enables interception, and shows the GUI for the current layer
  */
 InitScript() {
-    ; Start the interception driver if not already running
-    ; if (!IsInterceptRunning()) {
+    ; Start the interception driver
     EnableInterception()
-    ; }
-
     ; Show the numpad GUI with the current layer
     ShowNumpadGUI(currentLayer)
-
 }
 
 /**
- * Check if the interception driver is running
+ * Checks if the interception driver is running
  */
 IsInterceptRunning() {
     return ProcessExist("intercept.exe")
 }
 
 /**
- * Enable the interception driver
+ * Enables the interception driver (for advanced key remapping)
  */
 EnableInterception() {
     try {
         ; Kill any existing intercept processes
         RunWait('cmd.exe /c taskkill /IM intercept.exe /F', , "Hide")
-
         ; Run the intercept driver
         Run('cmd.exe /c ' INTERCEPT ' /apply', INTERCEPT_PATH, "Hide")
         interceptEnabled := true
-        ; ToolTip "Interception Successfully Enabled"
-        ; SetTimer RemoveToolTip, -500
     } catch as err {
-        MsgBox("Failed to start interception: " err.Message "`n`nPlease make sure intercept.exe is installed in: " INTERCEPT_PATH
-        )
+        MsgBox("Failed to start interception: " err.Message "`n`nPlease make sure intercept.exe is installed in: " INTERCEPT_PATH)
         ExitApp
     }
 }
 
 /**
- * Show the numpad GUI with the specified layer
+ * Shows the numpad GUI for the specified layer
+ * @param layer Which layer to show
+ * @param timeout Optional: how long to show the GUI
+ * @param iniFile Optional: custom INI file for images
  */
 ShowNumpadGUI(layer, timeout := -1, iniFile := "") {
     global currentLayer, numpadGui
-
     ; Destroy existing GUI if it exists
     if (numpadGui != "") {
         try {
@@ -81,16 +75,14 @@ ShowNumpadGUI(layer, timeout := -1, iniFile := "") {
         } catch {
         }
     }
-
     ; Create a new GUI with the specified layer
     numpadGui := DynamicNumpad(iniFile, timeout, layer)
-
     ; Show current layer in tooltip
     ShowLayerTooltip()
 }
 
 /**
- * Show a tooltip with the current layer
+ * Shows a tooltip with the current layer number
  */
 ShowLayerTooltip() {
     ToolTip "Layer: " currentLayer
@@ -102,82 +94,61 @@ RemoveToolTip() {
 }
 
 /**
- * Check if keys are currently being intercepted
+ * Returns true if the interception key is pressed (i.e., input is from macro pad)
  */
 IsIntercepted() {
     return GetKeyState(INTERCEPT_KEY, "P")
 }
 
 /**
- * Check if we're in a specific layer with interception active
+ * Returns true if we're in a specific layer and interception is active
+ * Used for conditional hotkeys below
  */
 numpadLayer1() {
     global currentLayer
-    if (currentLayer == 1 and IsIntercepted) {
-        return true
-    }
-    else {
-        return false
-    }
+    return (currentLayer == 1 and IsIntercepted)
 }
-
 numpadLayer2() {
     global currentLayer
-    if (currentLayer == 2 and IsIntercepted) {
-        return true
-    }
-    else {
-        return false
-    }
+    return (currentLayer == 2 and IsIntercepted)
 }
-
 numpadLayer3() {
     global currentLayer
-    if (currentLayer == 3 and IsIntercepted) {
-        return true
-    }
-    else {
-        return false
-    }
+    return (currentLayer == 3 and IsIntercepted)
 }
-
 numpadLayer4() {
     global currentLayer
-
-    if (currentLayer == 4 and IsIntercepted) {
-        return true
-    }
-    else {
-        return false
-    }
+    return (currentLayer == 4 and IsIntercepted)
 }
 
 ; =======================
 ; Hotkeys
 ; =======================
 
-; Layer switching hotkeys
+; --- Layer switching hotkeys (work in any layer) ---
 #HotIf IsIntercepted()
 
-; Decrement layer (/ key)
+; Numpad / : Go to previous layer
 NumpadDiv:: {
     global currentLayer
     currentLayer := currentLayer = 1 ? numpadLayers : currentLayer - 1
     ShowNumpadGUI(currentLayer)
 }
 
-; Show GUI with timeout (* key)
+; Numpad * : Show GUI for current layer (with timeout)
 NumpadMult:: {
     global currentLayer
     ShowNumpadGUI(currentLayer, numpadLayers + 1)
 }
 
-; Increment layer (- key)
+; Numpad - : Go to next layer
 NumpadSub:: {
     global currentLayer
     currentLayer := Mod(currentLayer, numpadLayers) + 1
     ShowNumpadGUI(currentLayer)
 }
+
+; --- Macro assignments for each layer ---
 
 ; Layer 1: Default Numpad (pass-through keys)
 #HotIf numpadLayer1()
@@ -196,12 +167,12 @@ NumpadAdd::
 ; NumpadSub::
 ; NumpadMult::
 ; NumpadDiv::
-NumpadEnter:: Send("{" A_ThisHotKey "}")
+NumpadEnter:: Send("{" A_ThisHotKey "}") ; Pass through key
 
 ; Layer 2: Application Launcher
 #HotIf numpadLayer2()
-Numpad1::Run("notepad.exe")
-Numpad2::Run("calc.exe")
+Numpad1::Run("notepad.exe")         ; Launch Notepad
+Numpad2::Run("calc.exe")            ; Launch Calculator
 Numpad3::
 Numpad4::
 Numpad5::
@@ -220,9 +191,9 @@ NumpadEnter:: {
     SetTimer ToolTip, -500
 }
 
-; Layer 3: YouTube Tools
+; Layer 3: Example Text Macros
 #HotIf numpadLayer3()
-Numpad1::Send("Hello, world!")
+Numpad1::Send("Hello, world!")      ; Send text
 Numpad2::Send("Your email@example.com")
 Numpad3::
 Numpad4::
@@ -242,7 +213,7 @@ NumpadEnter:: {
     SetTimer ToolTip, -500
 }
 
-; Layer 4: Custom Layer
+; Layer 4: Custom Layer (add your own macros)
 #HotIf numpadLayer4()
 Numpad1::
 Numpad2::
