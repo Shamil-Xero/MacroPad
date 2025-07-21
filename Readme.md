@@ -94,10 +94,10 @@ The Dynamic Numpad Macro System separates visual customization from macro and la
 - **How to Edit Macros and Layers:**
   1. Open `Macro-Pad.ahk` in a text editor.
   2. Scroll to the section labeled `; ======================= Hotkeys =======================`.
-  3. Each mode (layer) is defined using `#HotIf numpadModeX()` (where X is the mode number).
-  4. Under each mode, assign actions to numpad keys. For example:
+  3. Each layer is defined using `#HotIf numpadLayerX()` (where X is the layer number).
+  4. Under each layer, assign actions to numpad keys. For example:
      ```ahk
-     #HotIf numpadMode2()
+     #HotIf numpadLayer2()
      Numpad1::Run("notepad.exe")
      Numpad2::Send("Hello World!")
      ```
@@ -107,33 +107,33 @@ The Dynamic Numpad Macro System separates visual customization from macro and la
   - **Numpad \*** : Show current layer
   - **Numpad -** : Next layer
 - **Tip:**
-  You can define up to 4 modes/layers by default. To add more, adjust the `global numpadModes := 4` line and add corresponding `numpadModeX()` and `#HotIf numpadModeX()` blocks.
+  You can define up to 4 layers by default. To add more, adjust the `global numpadLayers := 4` line and add corresponding `numpadLayerX()` and `#HotIf numpadLayerX()` blocks.
 
 #### Example: Customizing Macros for Each Layer
 
 ```ahk
 ; ======================= Hotkeys =======================
 
-; Mode 1: Default Numpad (pass-through keys)
-#HotIf numpadMode1()
+; Layer 1: Default Numpad (pass-through keys)
+#HotIf numpadLayer1()
 Numpad1::Send("{Numpad1}")
 Numpad2::Send("{Numpad2}")
 ; ...add more keys as needed
 
-; Mode 2: Application Launcher
-#HotIf numpadMode2()
+; Layer 2: Application Launcher
+#HotIf numpadLayer2()
 Numpad1::Run("notepad.exe")
 Numpad2::Run("calc.exe")
 ; ...add more keys as needed
 
-; Mode 3: Text Macros
-#HotIf numpadMode3()
+; Layer 3: Text Macros
+#HotIf numpadLayer3()
 Numpad1::Send("Hello, world!")
 Numpad2::Send("Your email@example.com")
 ; ...add more keys as needed
 
-; Mode 4: Custom Shortcuts
-#HotIf numpadMode4()
+; Layer 4: Custom Shortcuts
+#HotIf numpadLayer4()
 Numpad1::Send("^c") ; Copy
 Numpad2::Send("^v") ; Paste
 ; ...add more keys as needed
