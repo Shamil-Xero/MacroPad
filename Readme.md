@@ -85,6 +85,7 @@ The Dynamic Numpad Macro System separates visual customization from macro and la
   - Window size and position
   - Transparency
   - Image INI files for button images (e.g., `ImagesIniFile1`, `ImagesIniFile2`, etc.)
+  - **`ShowMacroPadVisualization`**: Set to `true` to display the GUI, `false` to hide it completely
 - **How to Edit:**
   Open `numpad_settings.ini` in a text editor, adjust the values under `[Settings]`, save, and restart the macro pad to see changes.
 
@@ -153,6 +154,7 @@ The Dynamic Numpad Macro System offers a range of features to enhance your workf
 - **Visual Interface**
   - On-screen numpad shows current layer and assigned keys.
   - Visual feedback for key presses and active macros.
+  - Can be completely disabled via `ShowMacroPadVisualization` setting in `numpad_settings.ini`.
 - **Custom Button Images**
   - Assign images to buttons for each layer using the image INI files referenced in `numpad_settings.ini`.
   - Supported image formats: PNG, JPG, BMP, etc.
@@ -178,6 +180,10 @@ The Dynamic Numpad Macro System offers a range of features to enhance your workf
 
 ### Visual changes are not applied
 - Edit and save `numpad_settings.ini`, then restart the macro pad.
+
+### The GUI doesn't appear at all
+- Check the `ShowMacroPadVisualization` setting in `numpad_settings.ini` - it should be set to `true`.
+- If set to `false`, the macro pad will work but without visual feedback.
 
 ### Interception driver issues
 - The Interception driver may require administrator rights and a system restart after installation.

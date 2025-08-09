@@ -41,7 +41,7 @@ class DynamicNumpad {
             "Transparency", 70, "BackgroundColor", "1a1a1a", "TitleBarColor", "2d2d2d", "ButtonColor", "2d2d2d",
             "ButtonBackgroundColor", "3d3d3d", "FontSize", 12, "FontName", "Arial", "ButtonSize", 80,
             "ImagesIniFile1", "numpad_images.ini", "ImagesIniFile2", "numpad_images2.ini",
-            "ImagesIniFile3", "numpad_images3.ini", "ImagesIniFile4", "numpad_images4.ini", "Timeout", 5)
+            "ImagesIniFile3", "numpad_images3.ini", "ImagesIniFile4", "numpad_images4.ini", "ShowMacroPadVisualization", true, "Timeout", 5)
         if (!FileExist(this.settingsFile)) {
             try for k, v in this.settings
                 IniWrite(v, this.settingsFile, "Settings", k)
@@ -70,6 +70,11 @@ class DynamicNumpad {
     }
 
     ShowGUI() {
+        ; Check if visualization is enabled
+        if (!this.settings["ShowMacroPadVisualization"]) {
+            return
+        }
+        
         x := this.settings["WindowX"]
         y := this.settings["WindowY"]
         this.gui.Show("x" x " y" y " w" this.settings["WindowWidth"] " h" this.settings["WindowHeight"] " Hide NA")
@@ -141,7 +146,7 @@ class DynamicNumpad {
                 return
             }
             if (alpha < this.settings["Transparency"]) {
-                alpha += 5
+                alpha += 25
                 this.gui.Opt("+LastFound")
                 WinSetTransparent(alpha)
                 this.fadeInTimer := SetTimer(ObjBindMethod(DynamicNumpad, "FadeInTimerCallback", this, alpha), -20)
@@ -188,7 +193,7 @@ class DynamicNumpad {
                 return
             }
             if (alpha > 0) {
-                alpha -= 5
+                alpha -= 10
                 this.gui.Opt("+LastFound")
                 WinSetTransparent(alpha)
                 this.fadeOutTimer := SetTimer(ObjBindMethod(DynamicNumpad, "FadeOutTimerCallback", this, alpha), -20)
