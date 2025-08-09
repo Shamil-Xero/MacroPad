@@ -23,9 +23,36 @@ INTERCEPT_PATH := A_WorkingDir "\Lib\intercept"            ; Path to intercept f
 ; Initialize the script and show the GUI
 InitScript()
 
+; Set up cleanup when script exits
+OnExit(ExitFunc)
+
 ; =======================
 ; Functions
 ; =======================
+
+/**
+ * Cleanup function called when the script exits
+ * Ensures the Interception driver is properly closed
+ */
+ExitFunc(ExitReason, ExitCode) {
+    ; Close the Interception driver
+    DisableInterception()
+    ; Clean up any remaining tooltips
+    ToolTip ""
+}
+
+/**
+ * Disables and closes the Interception driver
+ */
+DisableInterception() {
+    try {
+        ; Kill any existing intercept processes
+        RunWait('cmd.exe /c taskkill /IM intercept.exe /F', , "Hide")
+        interceptEnabled := false
+    } catch as err {
+        ; Silently fail on exit - user might have already closed it
+    }
+}
 
 /**
  * Initializes the script, enables interception, and shows the GUI for the current layer
@@ -33,7 +60,7 @@ InitScript()
 InitScript() {
     ; Start the interception driver
     EnableInterception()
-    ; Show the numpad GUI with the current layer
+    ; Show the numpad GUI with the current layer (only if visualization is enabled)
     ShowNumpadGUI(currentLayer)
 }
 
@@ -55,7 +82,8 @@ EnableInterception() {
         Run('cmd.exe /c ' INTERCEPT ' /apply', INTERCEPT_PATH, "Hide")
         interceptEnabled := true
     } catch as err {
-        MsgBox("Failed to start interception: " err.Message "`n`nPlease make sure intercept.exe is installed in: " INTERCEPT_PATH)
+        MsgBox("Failed to start interception: " err.Message "`n`nPlease make sure intercept.exe is installed in: " INTERCEPT_PATH
+        )
         ExitApp
     }
 }
@@ -68,15 +96,30 @@ EnableInterception() {
  */
 ShowNumpadGUI(layer, timeout := -1, iniFile := "") {
     global currentLayer, numpadGui
+
+    ; Check if visualization is enabled in settings
+    visualizationEnabled := true
+    try {
+        visualizationEnabled := IniRead("numpad_settings.ini", "Settings", "ShowMacroPadGui", "true")
+        visualizationEnabled := (visualizationEnabled = "true")
+    } catch {
+        visualizationEnabled := true ; Default to true if there's an error reading the setting
+    }
+
     ; Destroy existing GUI if it exists
     if (numpadGui != "") {
         try {
             numpadGui.gui.Destroy()
         } catch {
         }
+        numpadGui := ""
     }
-    ; Create a new GUI with the specified layer
-    numpadGui := DynamicNumpad(iniFile, timeout, layer)
+
+    ; Only create and show GUI if visualization is enabled
+    if (visualizationEnabled) {
+        ; Create a new GUI with the specified layer
+        numpadGui := DynamicNumpad(iniFile, timeout, layer)
+    }
     ; Show current layer in tooltip
     ShowLayerTooltip()
 }
@@ -85,6 +128,7 @@ ShowNumpadGUI(layer, timeout := -1, iniFile := "") {
  * Shows a tooltip with the current layer number
  */
 ShowLayerTooltip() {
+    ; Always show tooltips regardless of GUI visibility setting
     ToolTip "Layer: " currentLayer
     SetTimer ToolTip, -500
 }
@@ -171,8 +215,8 @@ NumpadEnter:: Send("{" A_ThisHotKey "}") ; Pass through key
 
 ; Layer 2: Application Launcher
 #HotIf numpadLayer2()
-Numpad1::Run("notepad.exe")         ; Launch Notepad
-Numpad2::Run("calc.exe")            ; Launch Calculator
+Numpad1:: Run("notepad.exe")         ; Launch Notepad
+Numpad2:: Run("calc.exe")            ; Launch Calculator
 Numpad3::
 Numpad4::
 Numpad5::
@@ -193,8 +237,8 @@ NumpadEnter:: {
 
 ; Layer 3: Example Text Macros
 #HotIf numpadLayer3()
-Numpad1::Send("Hello, world!")      ; Send text
-Numpad2::Send("Your email@example.com")
+Numpad1:: Send("Hello, world!")      ; Send text
+Numpad2:: Send("Your email@example.com")
 Numpad3::
 Numpad4::
 Numpad5::

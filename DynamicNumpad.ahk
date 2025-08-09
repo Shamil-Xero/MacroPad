@@ -20,7 +20,7 @@ class DynamicNumpad {
     __New(iniFile := "", timeout := -1, mode := 1) {
         this.ClearTimers()
         this.mode := mode
-        this.LoadSettings()
+        this.LoadSettings()  ; This also calculates optimal animation timing
         if (iniFile != "") {
             this.iniFile := iniFile
         } else if (this.settings.Has("ImagesIniFile" this.mode)) {
@@ -29,19 +29,37 @@ class DynamicNumpad {
             this.iniFile := "numpad_images" this.mode ".ini"
         }
         this.timeout := (timeout != -1) ? timeout : this.settings["Timeout"]
-        this.CreateGUI()
-        this.CreateButtons()
-        this.LoadImagesFromIni()
-        this.ShowGUI()
+
+        ; Only create GUI if visualization is enabled
+        if (this.settings["ShowMacroPadGui"]) {
+            this.CreateGUI()
+            this.CreateButtons()
+            this.LoadImagesFromIni()
+            this.ShowGUI()
+        }
+    }
+
+    /**
+     * Calculates optimal animation timing for smooth 60fps animation
+     * Uses hardcoded 500ms duration for consistent fade animations
+     */
+    CalculateAnimationTiming() {
+        ; Calculate steps needed for smooth animation
+        this.animationSteps := Ceil(this.settings["Transparency"] / 5)
+        ; Use hardcoded 500ms duration for consistent animation
+        this.stepInterval := Max(16, 500 / this.animationSteps)
+        ; Ensure we don't exceed 60fps (16ms minimum interval)
+        this.stepInterval := Min(this.stepInterval, 16)
     }
 
     LoadSettings() {
         this.settings := Map(
-            "WindowX", 0, "WindowY", A_ScreenHeight - 500, "WindowWidth", 400, "WindowHeight", 500,
-            "Transparency", 70, "BackgroundColor", "1a1a1a", "TitleBarColor", "2d2d2d", "ButtonColor", "2d2d2d",
+            "WindowX", 0, "WindowY", A_ScreenHeight - 400, "WindowWidth", 300, "WindowHeight", 400,
+            "Transparency", 150, "BackgroundColor", "1a1a1a", "TitleBarColor", "2d2d2d", "ButtonColor", "2d2d2d",
             "ButtonBackgroundColor", "3d3d3d", "FontSize", 12, "FontName", "Arial", "ButtonSize", 80,
             "ImagesIniFile1", "numpad_images.ini", "ImagesIniFile2", "numpad_images2.ini",
-            "ImagesIniFile3", "numpad_images3.ini", "ImagesIniFile4", "numpad_images4.ini", "ShowMacroPadVisualization", true, "Timeout", 5)
+            "ImagesIniFile3", "numpad_images3.ini", "ImagesIniFile4", "numpad_images4.ini", "ShowMacroPadGui",
+            "true", "Timeout", 5)
         if (!FileExist(this.settingsFile)) {
             try for k, v in this.settings
                 IniWrite(v, this.settingsFile, "Settings", k)
@@ -52,6 +70,8 @@ class DynamicNumpad {
                     this.settings[k] := IsNumber(v) ? Number(v) : v
             }
         }
+        ; Calculate optimal animation timing after loading settings
+        this.CalculateAnimationTiming()
     }
 
     CreateGUI() {
@@ -71,10 +91,10 @@ class DynamicNumpad {
 
     ShowGUI() {
         ; Check if visualization is enabled
-        if (!this.settings["ShowMacroPadVisualization"]) {
+        if (!this.settings["ShowMacroPadGui"]) {
             return
         }
-        
+
         x := this.settings["WindowX"]
         y := this.settings["WindowY"]
         this.gui.Show("x" x " y" y " w" this.settings["WindowWidth"] " h" this.settings["WindowHeight"] " Hide NA")
@@ -146,10 +166,13 @@ class DynamicNumpad {
                 return
             }
             if (alpha < this.settings["Transparency"]) {
+                ; Use smaller steps for smoother animation
                 alpha += 25
                 this.gui.Opt("+LastFound")
                 WinSetTransparent(alpha)
-                this.fadeInTimer := SetTimer(ObjBindMethod(DynamicNumpad, "FadeInTimerCallback", this, alpha), -20)
+                ; Use pre-calculated timing for consistent animation
+                this.fadeInTimer := SetTimer(ObjBindMethod(DynamicNumpad, "FadeInTimerCallback", this, alpha), -this.stepInterval
+                )
             } else {
                 this.gui.Opt("+LastFound")
                 WinSetTransparent(this.settings["Transparency"])
@@ -193,10 +216,13 @@ class DynamicNumpad {
                 return
             }
             if (alpha > 0) {
+                ; Use smaller steps for smoother animation
                 alpha -= 10
                 this.gui.Opt("+LastFound")
                 WinSetTransparent(alpha)
-                this.fadeOutTimer := SetTimer(ObjBindMethod(DynamicNumpad, "FadeOutTimerCallback", this, alpha), -20)
+                ; Use pre-calculated timing for consistent animation
+                this.fadeOutTimer := SetTimer(ObjBindMethod(DynamicNumpad, "FadeOutTimerCallback", this, alpha), -this.stepInterval
+                )
             } else {
                 this.ClearTimers()
                 this.gui.Destroy()
@@ -279,6 +305,7 @@ class DynamicNumpad {
     }
 
     ClearTimers() {
+        ; Clear all active timers
         if (this.fadeTimer) {
             SetTimer(this.fadeTimer, 0)
             this.fadeTimer := 0
@@ -291,6 +318,10 @@ class DynamicNumpad {
             SetTimer(this.fadeOutTimer, 0)
             this.fadeOutTimer := 0
         }
+
+        ; Reset animation state
+        this.shouldFadeOut := false
+        this.isSelectingImage := false
     }
 }
 
