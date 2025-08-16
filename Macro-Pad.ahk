@@ -150,19 +150,19 @@ IsIntercepted() {
  */
 numpadLayer1() {
     global currentLayer
-    return (currentLayer == 1 and IsIntercepted)
+    return (currentLayer == 1 and IsIntercepted())
 }
 numpadLayer2() {
     global currentLayer
-    return (currentLayer == 2 and IsIntercepted)
+    return (currentLayer == 2 and IsIntercepted())
 }
 numpadLayer3() {
     global currentLayer
-    return (currentLayer == 3 and IsIntercepted)
+    return (currentLayer == 3 and IsIntercepted())
 }
 numpadLayer4() {
     global currentLayer
-    return (currentLayer == 4 and IsIntercepted)
+    return (currentLayer == 4 and IsIntercepted())
 }
 
 ; =======================
