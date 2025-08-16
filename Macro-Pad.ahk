@@ -1,3 +1,4 @@
+; // cspell:disable (This is for disabling the spell check in VSCode)
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 #Include "DynamicNumpad.ahk"  ; Include the refactored class for GUI and visuals
@@ -5,7 +6,7 @@
 ; === Global variables ===
 global numpadGui := ""                  ; Holds the GUI object
 global numpadLayers := 4                 ; Number of layers (sets of macros)
-global currentLayer := 1                 ; Currently active layer
+global currentLayer := 2                 ; Currently active layer
 global interceptEnabled := false         ; Whether interception is enabled
 
 ; =======================
@@ -212,7 +213,6 @@ NumpadAdd::
 ; NumpadMult::
 ; NumpadDiv::
 NumpadEnter:: Send("{" A_ThisHotKey "}") ; Pass through key
-
 ; Layer 2: Application Launcher
 #HotIf numpadLayer2()
 Numpad1:: Run("notepad.exe")         ; Launch Notepad
@@ -226,14 +226,14 @@ Numpad8::
 Numpad9::
 Numpad0::
 NumpadDot::
-NumpadAdd::
-; NumpadSub::
-; NumpadMult::
-; NumpadDiv::
-NumpadEnter:: {
+NumpadAdd:: {
     ToolTip "Layer: " currentLayer " - Key {" A_ThisHotkey "}"
     SetTimer ToolTip, -500
 }
+; NumpadSub::
+; NumpadMult::
+; NumpadDiv::
+NumpadEnter::Media_Play_Pause
 
 ; Layer 3: Example Text Macros
 #HotIf numpadLayer3()
@@ -248,14 +248,14 @@ Numpad8::
 Numpad9::
 Numpad0::
 NumpadDot::
-NumpadAdd::
-; NumpadSub::
-; NumpadMult::
-; NumpadDiv::
-NumpadEnter:: {
+NumpadAdd:: {
     ToolTip "Layer: " currentLayer " - Key {" A_ThisHotkey "}"
     SetTimer ToolTip, -500
 }
+; NumpadSub::
+; NumpadMult::
+; NumpadDiv::
+NumpadEnter::Media_Play_Pause
 
 ; Layer 4: Custom Layer (add your own macros)
 #HotIf numpadLayer4()
@@ -270,13 +270,13 @@ Numpad8::
 Numpad9::
 Numpad0::
 NumpadDot::
-NumpadAdd::
-; NumpadSub::
-; NumpadMult::
-; NumpadDiv::
-NumpadEnter:: {
+NumpadAdd:: {
     ToolTip "Layer: " currentLayer " - Key {" A_ThisHotkey "}"
     SetTimer ToolTip, -500
 }
+; NumpadSub::
+; NumpadMult::
+; NumpadDiv::
+NumpadEnter::Media_Play_Pause
 
 #HotIf  ; End conditional hotkeys
