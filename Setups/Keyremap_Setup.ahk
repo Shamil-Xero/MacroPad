@@ -24,7 +24,7 @@ KeyWaitAny(Options := "") {
 }
 
 PromptPress() {
-    ToolTip "Press the any key and then press {ESC} a couple of times"
+    ToolTip "Press the key on your secondary keyboard and then press {ESC} on your main keyboard a 2 times"
 }
 
 result := MsgBox("Do you want to continue with Keyremap Setup?", "Keyremap Setup", "YesNo")
