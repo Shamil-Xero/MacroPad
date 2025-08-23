@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 
 class DynamicNumpad {
-    settingsFile := "numpad_settings.ini"
+    settingsFile := A_ScriptDir "\numpad_settings.ini"
     iniFile := ""
     mode := 1
     timeout := 5

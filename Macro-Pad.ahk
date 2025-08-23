@@ -1,12 +1,14 @@
 ; // cspell:disable (This is for disabling the spell check in VSCode)
 #Requires AutoHotkey v2.0
 #SingleInstance Force
+Bug SetWorkingDir A_ScriptDir "\.."
 #Include "DynamicNumpad.ahk"  ; Include the refactored class for GUI and visuals
 
 ; === Global variables ===
 global numpadGui := ""                  ; Holds the GUI object
 global numpadLayers := 4                 ; Number of layers (sets of macros)
 global currentLayer := 2                 ; Currently active layer
+global LayerName := Map()                ; Holds the layer names
 global interceptEnabled := false         ; Whether interception is enabled
 
 ; =======================
@@ -14,8 +16,8 @@ global interceptEnabled := false         ; Whether interception is enabled
 ; =======================7
 ; Key used to determine if key is intercepted
 INTERCEPT_KEY := "F23"                   ; Modifier key for identifying input from the macro pad
-INTERCEPT := A_WorkingDir "\Lib\Intercept\intercept.exe"   ; Path to intercept.exe
-INTERCEPT_PATH := A_WorkingDir "\Lib\intercept"            ; Path to intercept folder
+INTERCEPT := A_ScriptDir "\Lib\Intercept\intercept.exe"   ; Path to intercept.exe
+INTERCEPT_PATH := A_ScriptDir "\Lib\intercept"            ; Path to intercept folder
 
 ; =======================
 ; Main Script
@@ -125,12 +127,9 @@ ShowNumpadGUI(layer, timeout := -1, iniFile := "") {
     ShowLayerTooltip()
 }
 
-/**
- * Shows a tooltip with the current layer number
- */
 ShowLayerTooltip() {
-    ; Always show tooltips regardless of GUI visibility setting
-    ToolTip "Layer: " currentLayer
+    ;Shows a tooltip with the current layer number
+    ToolTip "Layer: " currentLayer "`n" LayerName[currentLayer]
     SetTimer ToolTip, -500
 }
 
@@ -165,6 +164,25 @@ numpadLayer4() {
     global currentLayer
     return (currentLayer == 4 and IsIntercepted())
 }
+
+; =======================
+; Layer Names
+; =======================
+
+LayerName[1] := "Default Numpad" ; (pass-through keys)
+LayerName[2] := "Applications"
+LayerName[3] := "Example Text Macros"
+LayerName[4] := "Custom Layer" ; (add your own macros)
+
+; =======================
+; Main Script
+; =======================
+
+; Initialize the script and show the GUI
+InitScript()
+
+; Set up cleanup when script exits
+OnExit(ExitFunc)
 
 ; =======================
 ; Hotkeys
@@ -213,7 +231,7 @@ NumpadAdd::
 ; NumpadMult::
 ; NumpadDiv::
 NumpadEnter:: Send("{" A_ThisHotKey "}") ; Pass through key
-; Layer 2: Application Launcher
+; Layer 2: Applications
 #HotIf numpadLayer2()
 Numpad1:: Run("notepad.exe")         ; Launch Notepad
 Numpad2:: Run("calc.exe")            ; Launch Calculator
