@@ -7,6 +7,7 @@
 global numpadGui := ""                  ; Holds the GUI object
 global numpadLayers := 4                 ; Number of layers (sets of macros)
 global currentLayer := 2                 ; Currently active layer
+global LayerName := Map()                ; Holds the layer names
 global interceptEnabled := false         ; Whether interception is enabled
 
 ; =======================
@@ -125,12 +126,9 @@ ShowNumpadGUI(layer, timeout := -1, iniFile := "") {
     ShowLayerTooltip()
 }
 
-/**
- * Shows a tooltip with the current layer number
- */
 ShowLayerTooltip() {
-    ; Always show tooltips regardless of GUI visibility setting
-    ToolTip "Layer: " currentLayer
+    ;Shows a tooltip with the current layer number
+    ToolTip "Layer: " currentLayer "`n" LayerName[currentLayer]
     SetTimer ToolTip, -500
 }
 
@@ -165,6 +163,25 @@ numpadLayer4() {
     global currentLayer
     return (currentLayer == 4 and IsIntercepted())
 }
+
+; =======================
+; Layer Names
+; =======================
+
+LayerName[1] := "Default Numpad" ; (pass-through keys)
+LayerName[2] := "Applications"
+LayerName[3] := "Example Text Macros"
+LayerName[4] := "Custom Layer" ; (add your own macros)
+
+; =======================
+; Main Script
+; =======================
+
+; Initialize the script and show the GUI
+InitScript()
+
+; Set up cleanup when script exits
+OnExit(ExitFunc)
 
 ; =======================
 ; Hotkeys
@@ -213,7 +230,7 @@ NumpadAdd::
 ; NumpadMult::
 ; NumpadDiv::
 NumpadEnter:: Send("{" A_ThisHotKey "}") ; Pass through key
-; Layer 2: Application Launcher
+; Layer 2: Applications
 #HotIf numpadLayer2()
 Numpad1:: Run("notepad.exe")         ; Launch Notepad
 Numpad2:: Run("calc.exe")            ; Launch Calculator
